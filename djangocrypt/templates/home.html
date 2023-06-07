@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bootstrap Select Example</title>
+  <!-- Bootstrap CSS via CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.0/css/bootstrap.min.css">
+  <!-- Bootstrap Select CSS via CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0/css/bootstrap-select.min.css">
+  <!-- JSON Highlight CSS via CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/styles/vs2015.min.css">
+  <style>
+    .json-container {
+      background-color: #f8f9fa;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 4px;
+      height: 100%;
+    }
+
+    pre, code {
+        white-space: pre-wrap;
+    }
+        </style>
+ 
+</head>
+
+<body>
+  <div class="container mt-5">
+    <div class="row">
+      <div class="col-md-6 offset-md-3">
+        <form id="myForm">
+          <div class="mb-3">
+            <label for="userId" class="form-label">User ID</label>
+            <input type="text" class="form-control" id="userId" placeholder="Enter User ID">
+          </div>
+          <div class="mb-3">
+            <label for="selectOption" class="form-label">Select Option</label>
+            <select class="form-select selectpicker" id="selectOption" data-live-search="true">
+              <option value="example1">example1</option>
+              <option value="example2">example2</option>
+              <option value="example3">example3</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+        <pre><code></code></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS via CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.0/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+  <!-- Bootstrap Select JS via CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0/js/bootstrap-select.min.js"></script>
+  <!-- JSON Highlight JS via CDN -->
+  <script src='//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js'></script>
+
+  <script>hljs.initHighlightingOnLoad();</script>
+
+<script>
+
+    function encryptValue(value) {
+        // Convert the key and IV to WordArray
+        var key = "mysecretkey12345"
+        var iv = "n2r5u8x/A%D*G-Ka"
+        // Encrypt using AES-128-CBC with PKCS7 padding
+        var encrypted = CryptoJS.AES.encrypt(value, CryptoJS.enc.Utf8.parse(key), {
+            iv: CryptoJS.enc.Utf8.parse(iv),
+            mode: CryptoJS.mode.CBC,
+            padding: CryptoJS.pad.Pkcs7
+        });
+
+        return encrypted.toString();
+    }
+
+    function decryptedvalue(value) {
+
+        var key = "mysecretkey12345"
+var iv = "n2r5u8x/A%D*G-Ka"
+
+bytes = CryptoJS.AES.decrypt(value, CryptoJS.enc.Utf8.parse(key),
+{	
+	keySize: 128 / 8,
+	iv:  CryptoJS.enc.Utf8.parse(iv),
+    mode: CryptoJS.mode.CBC
+});
+var originalText = bytes.toString(CryptoJS.enc.Utf8);
+console.log(originalText);
+return originalText 
+
+    }
+
+</script>
+
+
+  <script>
+    
+document.getElementById("myForm").addEventListener("submit", function(event) {
+  event.preventDefault(); // Prevent form submission
+
+  // Create XMLHttpRequest object
+  var xhr = new XMLHttpRequest();
+
+  // Get the values from the form
+  var userId = document.getElementById("userId").value;
+  var selectOption = document.getElementById("selectOption").value;
+
+  // Prepare the request URL and body based on the selected option
+  var url = "";
+  var requestBody = "";
+  if (selectOption === "example1") {
+    url = "/api/getuser";
+    requestBody = encryptValue(JSON.stringify({ user_id: userId }));
+  } else if (selectOption === "example2") {
+    url = "/api/getuser2";
+    requestBody = JSON.stringify({ user_id: encryptValue(userId) });
+  } else if (selectOption === "example3") {
+    url = "/api/getuser3";
+    enckey = encryptValue("user_id")
+    requestBody = JSON.stringify({ [enckey] : encryptValue(userId) });
+  } else if (selectOption === "example4") {
+    url = "YOUR_API_ENDPOINT_4";
+    requestBody = JSON.stringify({ userId: userId });
+  } else if (selectOption === "example5") {
+    url = "YOUR_API_ENDPOINT_5";
+    requestBody = JSON.stringify({ userId: userId });
+  } else if (selectOption === "example6") {
+    url = "YOUR_API_ENDPOINT_6";
+    requestBody = JSON.stringify({ userId: userId });
+  }
+
+  // Configure the request
+  xhr.open("POST", url, true);
+  xhr.setRequestHeader("Content-Type", "application/json");
+
+  // Define the onload callback function
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+      // Display the response JSON in the UI with highlighting
+      //var responseContainer = document.getElementById("responseContainer");
+      if (selectOption === "example1") {
+        data = xhr.response
+        decryypted = decryptedvalue(data.slice(1, -1))
+      }
+      else if (selectOption === "example2") {   
+        data = JSON.parse(xhr.responseText)
+        decryypted = decryptedvalue(data['data'])
+      }
+
+
+      else if (selectOption === "example3") {   
+        data = JSON.parse(xhr.responseText)
+        keyname = encryptValue("data")
+        decryypted = decryptedvalue(data[keyname])
+        
+
+      }
+      document.querySelector('code').innerHTML = decryypted
+
+      hljs.highlightBlock(document.querySelector('code'))
+
+      
+      //responseContainer.innerHTML ='<pre><code class="json">' +hljs.highlight("json", decryypted) +        "</code></pre>";
+    }
+  };
+
+  // Send the request
+  xhr.send(requestBody);
+});
+
+  </script>
+</body>
+
+</html>
