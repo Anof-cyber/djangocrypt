@@ -12,8 +12,13 @@ A test app for PyCript Burp Extension
 
 ```bash
 
-## Installation
+## Installation Method 1
+git clone https://github.com/Anof-cyber/djangocrypt
+cd djangocrypt
 docker build -t djangocrypt .    
+
+## Installation Method 2
+docker pull souravkalal/djangocrypt
 
 ## Run Web Server
 docker run -p 8000:8000 djangocrypt 
