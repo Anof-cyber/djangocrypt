@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Simple Bootstrap Login Page</title>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            Login
+          </div>
+          <div class="card-body">
+            <form id="loginForm">
+              <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" class="form-control" id="username" name="username" required>
+              </div>
+              <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+              </div>
+              <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS and Custom JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script>
+      
+    function decryptedvalue(value) {
+
+        var key = "mysecretkey12345"
+var iv = "n2r5u8x/A%D*G-Ka"
+
+bytes = CryptoJS.AES.decrypt(value, CryptoJS.enc.Utf8.parse(key),
+{	
+	keySize: 128 / 8,
+	iv:  CryptoJS.enc.Utf8.parse(iv),
+    mode: CryptoJS.mode.CBC
+});
+var originalText = bytes.toString(CryptoJS.enc.Utf8);
+console.log(originalText);
+return originalText 
+
+    }
+      
+      function encryptValue(value) {
+        // Encrypt using AES-128-CBC with PKCS7 padding
+        var key = "mysecretkey12345"
+var iv = "n2r5u8x/A%D*G-Ka"
+        const encrypted = CryptoJS.AES.encrypt(value, CryptoJS.enc.Utf8.parse(key), {
+          iv: CryptoJS.enc.Utf8.parse(iv),
+          mode: CryptoJS.mode.CBC,
+          padding: CryptoJS.pad.Pkcs7
+        });
+        return encrypted.toString();
+      }
+      
+      document.getElementById('loginForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent form submission
+      
+        // Get form data
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        // Validate username (only alphanumeric characters allowed)
+  const alphanumericPattern = /^[a-zA-Z0-9]+$/;
+  if (!alphanumericPattern.test(username)) {
+    alert('Username can only contain alphanumeric characters.');
+    return;
+  }
+
+        const loginData = {
+            username: username,
+            password: password
+          };
+
+        JSON.stringify(loginData)
+      
+        // Generate a new 128-bit key and IV
+        
+        // Encrypt username and password using the encryptValue function with the new key and IV
+        const encryptedbody = encryptValue(JSON.stringify(loginData));
+       
+        // Create a JSON object with the login data
+        
+      
+        // Create a JSON object containing the key, IV, and encrypted data
+      
+      
+        // Send login request to the server using fetch API
+        fetch('/complete-body/api/2', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: encryptedbody
+        })
+        .then(response => response.json())
+        .then(data => {
+          // Handle the response from the server here (e.g., show success message, redirect to another page, etc.)
+          console.log(decryptedvalue(data));
+        })
+        .catch(error => {
+          // Handle any errors that occurred during the request
+          console.error('Error:', error);
+        });
+      });
+      
+  </script>
+</body>
+</html>

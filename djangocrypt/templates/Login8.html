@@ -1,0 +1,111 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Simple Bootstrap Login Page</title>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            Login
+          </div>
+          <div class="card-body">
+            <form id="loginForm">
+              <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" class="form-control" id="username" name="username" required>
+              </div>
+              <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+              </div>
+              <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS and Custom JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jsencrypt/2.3.1/jsencrypt.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="{% static "static/test.js" %}"></script>
+
+  <script>
+     // ... (Your existing JavaScript code)
+
+     function encryptWithRSA(data, rsaPublicKey) {
+        const encryptor = new JSEncrypt();
+        encryptor.setKey(rsaPublicKey);
+        return encryptor.encrypt(data);
+      }
+
+
+document.getElementById('loginForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent form submission
+  
+    // Get form data
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+  
+    // Validate username (only alphanumeric characters allowed)
+    const alphanumericPattern = /^[a-zA-Z0-9]+$/;
+    if (!alphanumericPattern.test(username)) {
+      alert('Username can only contain alphanumeric characters.');
+      return;
+    }
+  
+
+  
+    // RSA public key (replace with your actual RSA public key in PEM format)
+    const rsaPublicKey = `-----BEGIN PUBLIC KEY-----
+    MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkGPlXR4rX4tFNj47EmIX
+    Yji8iS+DGFqE9TI52zmHKQz15PgvU5zzCLTST1QE1f/izPdAXkmFmNMRNkbXXUhf
+    KhOv55/DBYqQaCjEn/r5ZjFgwOIC0j6PU1jCA3Lm0en3IZObpcbvM9nGrpd6m0n9
+    f2QvziEWDYUN0LUtaE3pry9BtRCyFS9hiBEg9Vo1GLHN2koqLDasxzJe3iO17bR+
+    LYq7jxfx/HQaWyWp8Dv9dXEa61iydpl+KFdy/L+5z9VBLXnmhD82mFfkenPkYDIv
+    +Z16RUiniQzUuyzEaLcTlSM+n6MrjuGlu2NHSPQGykXpD0U48jTVmgBYiJu1zxGR
+    9QIDAQAB
+    -----END PUBLIC KEY-----
+    `;
+  
+    // Encrypt username and password using RSA public key
+    const encryptedUsername = encryptWithRSA(username, rsaPublicKey);
+    const encryptedPassword = encryptWithRSA(password, rsaPublicKey);
+  
+    const encryptedLoginData = {
+      username: encryptedUsername,
+      password: encryptedPassword
+    };
+  
+    // Send login request to the server using fetch API
+    fetch('/RSA/api/1', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(encryptedLoginData)
+    })
+    .then(response => response.json())
+    .then(data => {
+      // Handle the response from the server here (e.g., show success message, redirect to another page, etc.)
+      console.log(data);
+    })
+    .catch(error => {
+      // Handle any errors that occurred during the request
+      console.error('Error:', error);
+    });
+  });
+  
+      
+  </script>
+</body>
+</html>
